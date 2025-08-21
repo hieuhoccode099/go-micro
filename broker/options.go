@@ -49,6 +49,9 @@ type SubscribeOptions struct {
 	// AutoAck defaults to true. When a handler returns
 	// with a nil error the message is acked.
 	AutoAck bool
+
+	// PrefetchCount is the number of messages to prefetch
+	PrefetchCount int
 }
 
 type Option func(*Options)
@@ -158,5 +161,12 @@ func Logger(l logger.Logger) Option {
 func SubscribeContext(ctx context.Context) SubscribeOption {
 	return func(o *SubscribeOptions) {
 		o.Context = ctx
+	}
+}
+
+// PrefetchCount sets the number of messages to prefetch.
+func PrefetchCount(count int) SubscribeOption {
+	return func(o *SubscribeOptions) {
+		o.PrefetchCount = count
 	}
 }

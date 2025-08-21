@@ -127,6 +127,7 @@ func (s *subscriber) resubscribe() {
 			s.queueArgs,
 			s.opts.AutoAck,
 			s.durableQueue,
+			s.opts.PrefetchCount,
 		)
 
 		s.r.mtx.Unlock()
