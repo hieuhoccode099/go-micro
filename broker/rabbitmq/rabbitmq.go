@@ -117,6 +117,10 @@ func (s *subscriber) resubscribe() {
 		s.r.mtx.Lock()
 		if !s.r.conn.connected {
 			s.r.mtx.Unlock()
+			time.Sleep(reSubscribeDelay)
+			if reSubscribeDelay < maxResubscribeDelay {
+				reSubscribeDelay *= expFactor
+			}
 			continue
 		}
 
@@ -311,9 +315,17 @@ func (r *rbroker) Subscribe(topic string, handler broker.Handler, opts ...broker
 		}
 	}
 
-	sret := &subscriber{topic: topic, opts: opt, unsub: make(chan bool), r: r,
-		durableQueue: durableQueue, fn: fn, headers: headers, queueArgs: qArgs,
-		wg: sync.WaitGroup{}}
+	sret := &subscriber{
+		topic:        topic,
+		opts:         opt,
+		unsub:        make(chan bool),
+		r:            r,
+		durableQueue: durableQueue,
+		fn:           fn,
+		headers:      headers,
+		queueArgs:    qArgs,
+		wg:           sync.WaitGroup{},
+	}
 
 	go sret.resubscribe()
 
